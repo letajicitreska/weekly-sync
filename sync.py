@@ -52,7 +52,8 @@ while True:
             try:
                 pj = req(f"{BASE}/accounts/{SLUG}/invoices/{i['id']}/payments.json", headers=AUTH)
                 pays = [{"paid_on": p.get("paid_on"), "amount": p.get("amount")} for p in (pj or [])]
-            except Exception:
+            except Exception as e:
+                print("payments ERR", type(e).__name__, getattr(e, "code", ""), file=sys.stderr)
                 pays = None
         out.append({
             "payments": pays,
