@@ -47,7 +47,15 @@ while True:
     for i in batch:
         name = i.get("client_name") or ""
         is_org = bool(i.get("client_registration_no"))
+        pays = []
+        if i.get("status") not in ("paid", "cancelled") and i.get("id"):
+            try:
+                pj = req(f"{BASE}/accounts/{SLUG}/invoices/{i['id']}/payments.json", headers=AUTH)
+                pays = [{"paid_on": p.get("paid_on"), "amount": p.get("amount")} for p in (pj or [])]
+            except Exception:
+                pays = None
         out.append({
+            "payments": pays,
             "number": i.get("number"),
             "type": i.get("document_type"),
             "issued_on": i.get("issued_on"),
