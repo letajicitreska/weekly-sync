@@ -56,6 +56,8 @@ while True:
             "paid_on": i.get("paid_on"),
             "status": i.get("status"),
             "total": i.get("total"),
+            "paid_amount": i.get("paid_amount"),
+            "remaining_amount": i.get("remaining_amount"),
             "currency": i.get("currency"),
             "client": name if is_org else initials(name),
             "items": [{"name": clean(l.get("name") or ""), "qty": float(l.get("quantity") or 0), "price": float(l.get("unit_price") or 0)}
