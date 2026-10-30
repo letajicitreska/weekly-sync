@@ -1,0 +1,34 @@
+name: weekly
+on:
+  schedule:
+    - cron: "0 12 * * 5"
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: ["run.txt", "sync.py", ".github/workflows/sync.yml"]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: run
+        env:
+          FAKTUROID_CLIENT_ID: ${{ secrets.FAKTUROID_CLIENT_ID }}
+          FAKTUROID_CLIENT_SECRET: ${{ secrets.FAKTUROID_CLIENT_SECRET }}
+        run: python sync.py > /dev/null
+      - name: encrypt
+        run: |
+          openssl cms -encrypt -binary -aes256 -outform DER -in data/out.json -out data/cache.bin pub.pem
+          rm -f data/out.json
+      - name: commit
+        run: |
+          git config user.name "sync-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/cache.bin
+          git diff --cached --quiet || git commit -m "sync $(date -u +%F)"
+          git push
