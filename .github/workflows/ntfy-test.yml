@@ -1,0 +1,24 @@
+name: ntfy-test
+
+# Jednorázový test doručení: 3 stejné zprávy bez diakritiky po minutě. Po testu smazat.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 3 testovaci zpravy
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          for i in 1 2 3; do
+            curl -s -o /dev/null -w "zprava $i: %{http_code}\n" \
+              -H "Content-Type: application/json" \
+              -d "{\"topic\":\"$NTFY_TOPIC\",\"title\":\"Test $i/3\",\"message\":\"Test doruceni $i z 3\",\"priority\":4}" \
+              https://ntfy.sh/
+            [ "$i" -lt 3 ] && sleep 60
+          done
