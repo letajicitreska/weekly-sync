@@ -57,7 +57,7 @@ def notify(title, body):
     req = urllib.request.Request(
         f"https://ntfy.sh/{TOPIC}",
         data=body.encode("utf-8"),
-        headers={"Title": title.encode("utf-8"), "Click": LINK, "Tags": "bento"},
+        headers={"Title": title.encode("utf-8"), "Click": LINK, "Tags": "bento", "Priority": "high"},
         method="POST",
     )
     urllib.request.urlopen(req, timeout=30)
