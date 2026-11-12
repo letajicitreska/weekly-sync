@@ -7,6 +7,10 @@ on:
     - cron: "40 15 * * 0-4"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   menu:
     runs-on: ubuntu-latest
@@ -18,4 +22,5 @@ jobs:
       - name: Jídelníček na zítřek -> ntfy
         env:
           SCHEDULE: ${{ github.event.schedule }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python krabicky/menu.py
