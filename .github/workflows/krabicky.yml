@@ -2,10 +2,15 @@ name: krabicky
 
 on:
   schedule:
-    # NE–ČT; 14:40 UTC = 16:40 letní čas, 15:40 UTC = 16:40 zimní čas (skript pošle jen ten správný)
-    - cron: "40 14 * * 0-4"
-    - cron: "40 15 * * 0-4"
+    # NE–ČT ráno. Menu se stáhne hned a ntfy ho doručí přesně v 16:40 pražského času
+    # (GitHub cron chodí i o hodiny později, proto se nespoléhá na čas běhu).
+    - cron: "17 5 * * 0-4"   # hlavní běh (6:17 v zimě, 7:17 v létě)
+    - cron: "23 10 * * 0-4"  # záloha, kdyby GitHub ranní běh vynechal; duplicitu pozná a nic nepošle
   workflow_dispatch:
+    inputs:
+      delay_min:
+        description: "Test: doručit za N minut (prázdné = hned)"
+        default: ""
 
 permissions:
   contents: read
@@ -13,6 +18,7 @@ permissions:
 jobs:
   menu:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,5 +27,6 @@ jobs:
       - name: Jídelníček na zítřek -> ntfy
         env:
           SCHEDULE: ${{ github.event.schedule }}
+          DELAY_MIN: ${{ github.event.inputs.delay_min }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python krabicky/menu.py
