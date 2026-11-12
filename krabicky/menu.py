@@ -54,13 +54,23 @@ def find_day(target):
 
 
 def notify(title, body):
+    # JSON publikace: diakritika v titulku nerozbije hlavičky (a tím push na iPhone)
+    payload = {
+        "topic": TOPIC,
+        "title": title,
+        "message": body,
+        "priority": 4,
+        "tags": ["bento"],
+        "click": LINK,
+    }
     req = urllib.request.Request(
-        f"https://ntfy.sh/{TOPIC}",
-        data=body.encode("utf-8"),
-        headers={"Title": title.encode("utf-8"), "Click": LINK, "Tags": "bento", "Priority": "high"},
+        "https://ntfy.sh/",
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
         method="POST",
     )
-    urllib.request.urlopen(req, timeout=30)
+    with urllib.request.urlopen(req, timeout=30) as r:
+        print("ntfy:", r.status, r.read()[:200])
 
 
 def main():
