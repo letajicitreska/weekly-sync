@@ -1,0 +1,21 @@
+name: krabicky
+
+on:
+  schedule:
+    # NE–ČT; 14:40 UTC = 16:40 letní čas, 15:40 UTC = 16:40 zimní čas (skript pošle jen ten správný)
+    - cron: "40 14 * * 0-4"
+    - cron: "40 15 * * 0-4"
+  workflow_dispatch:
+
+jobs:
+  menu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Jídelníček na zítřek -> ntfy
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+        run: python krabicky/menu.py
