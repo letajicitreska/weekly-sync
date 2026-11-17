@@ -1,0 +1,30 @@
+name: prehled
+
+on:
+  workflow_dispatch: {}   # hlavní spouštění: cron-job.org v pondělí 9:30 Praha
+  schedule:
+    - cron: "41 9 * * 1"  # záloha (GitHub cron chodí pozdě nebo vůbec); dvojí zpráva nevadí
+
+concurrency:
+  group: prehled
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Přehled automatizací za minulý týden -> ntfy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python prehled/prehled.py
