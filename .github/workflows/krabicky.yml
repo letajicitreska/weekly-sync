@@ -8,6 +8,13 @@ on:
     - cron: "23 12 * * 0-4"
     - cron: "41 13 * * 0-4"
   workflow_dispatch:
+    # Hlavní spouštění: cron-job.org v 16:40 Praha volá dispatch s mode=cron
+    # (GitHub cron chodí o hodiny později nebo vůbec; zůstává jen jako záloha).
+    # Ruční spuštění bez mode = test, pošle hned a vždy.
+    inputs:
+      mode:
+        description: "cron = běh jako plánovaný (kontrola duplicity), prázdné = test"
+        default: ""
 
 concurrency:
   group: krabicky
@@ -27,6 +34,6 @@ jobs:
           python-version: "3.12"
       - name: Jídelníček na zítřek -> ntfy
         env:
-          SCHEDULE: ${{ github.event.schedule }}
+          SCHEDULE: ${{ github.event.schedule || inputs.mode }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python krabicky/menu.py

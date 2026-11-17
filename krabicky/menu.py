@@ -1,6 +1,7 @@
 """Jídelníček Beru krabiček na zítřek -> push notifikace přes ntfy.
 
-Spouští .github/workflows/krabicky.yml (NE–ČT, tři běhy mezi 11. a 14. hodinou UTC).
+Spouští .github/workflows/krabicky.yml: hlavně cron-job.org v 16:40 Praha (dispatch s mode=cron),
+záložně GitHub cron (NE–ČT, tři běhy mezi 11. a 14. hodinou UTC).
 GitHub cron chodí i o hodiny později, proto běh naběhne s rezervou, počká do 16:40
 pražského času (zimní i letní čas řeší ZoneInfo) a pošle okamžitou zprávu. ntfy zprávy
 s odkladem ("delay") se na iPhonu jako upozornění neukážou, jen v appce (ověřeno 12. 11. 2026).
